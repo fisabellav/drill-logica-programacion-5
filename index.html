@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuessNumber</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    
+</head>
+<body>
+    <div class="position-absolute top-50 start-50 translate-middle">
+        <div class="card d-flex flex-column" style="width: 28rem; height: 22rem;">
+            <h3 class="handlee-regular align-self-center my-4">Guess the Number</h3>
+            
+            <div class="card-body d-flex flex-column align-items-center">
+                <label class="form-label handlee-regular" for="option-group">Selecciona la cantidad de intentos</label>
+                <div class="btn-group mb-3 w-75 justify-content-center" role="group" id="option-group" name="option-group" aria-label="Basic radio toggle button group">
+                    <button type="button" class="btn btn-outline-secondary option-btn" data-value="1">1</button>
+                    <button type="button" class="btn btn-outline-secondary option-btn" data-value="2">2</button>
+                    <button type="button" class="btn btn-outline-secondary option-btn" data-value="3">3</button>
+                    <button type="button" class="btn btn-outline-secondary option-btn" data-value="4">4</button>
+                    <button type="button" class="btn btn-outline-secondary option-btn" data-value="5">5</button>
+                </div>
+                <div data-mdb-input-init class="form-outline mb-4 flex-fill px-2 hidden" id="number-input-container">
+                    <label class="form-label handlee-regular" for="number-input">Ingresa un número del 1 al 100</label>
+                    <!-- como es tipo number no se puede ingresar otra cosa que no sean números -->
+                    <input type="number" id="number-input" name="number-input" class="form-control" min="1" value="1" />
+                </div>
+            </div>
+            <div class="card-footer mt-auto d-flex justify-content-center handlee-regular">
+                <button type="button" class="btn btn-light" id="number-btn">Comenzar Juego</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./assets/js/index.js"></script>
+    
+</body>
+</html>

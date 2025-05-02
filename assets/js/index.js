@@ -5,55 +5,135 @@
 // El número secreto puede ser definido manualmente o generar un número aleatorio, pero recuerda que debe ser del 1 al 100.
 // Debe ser capaz de identificar si el dato de entrada es de tipo number, en caso contrario debe mandar un mensaje de error y volver a solicitar el dato.
 
-const prompt = require("prompt-sync")(); // Importa la librería prompt-sync para usar prompt en Node.js
+const adivinarBtn = document.getElementById("number-btn");
+const optionButtons = document.querySelectorAll('.option-btn');
+const numberInput = document.getElementById("number-input");
+const numberContainer = document.getElementById("number-input-container");
+// Variables globales
+let selectedValue = null; // Variable accesible desde todo el archivo
+let attempts = 0; // Número de intentos permitidos
+let secretNumber = null; // Número secreto
+let guessedNumbers = []; // Números ingresados por el usuario
+let currentAttempt = 0; // Intentos actuales
 
+optionButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Quitar la clase 'selected' de todos los botones
+        optionButtons.forEach(b => b.classList.remove('selected'));
 
-function solicitarNumero(mensaje) {
-    let userNum = prompt(mensaje);
-    if (isNaN(userNum)) {
-        console.log("Por favor, ingresa un número válido.");
+        // Agregar clase 'selected' al botón presionado
+        btn.classList.add('selected');
+
+        // Puedes usar el valor seleccionado si quieres usarlo después
+        selectedValue = btn.getAttribute('data-value');
+    });
+});
+
+// funciones originales
+function solicitarNumero() {
+    let userNum = numberInput.value; // Obtener el valor del input
+    numberInput.value = ""; // Limpiar el input después de obtener el valor
+    if (isNaN(userNum)|| userNum === "") {
+        // Si el valor no es un número o está vacío, mostrar un mensaje de error
+        alertSweet("Por favor, ingresa un número válido.", "error");
         return null;
     }
     userNum = parseInt(userNum);
     if (userNum < 1 || userNum > 100) {
-        console.log("El número debe estar entre 1 y 100. Intenta de nuevo.");
+        alertSweet("El número debe estar entre 1 y 100. Intenta de nuevo.", "error");
         return null;
     }
     return userNum;
 }
 
-function mostrarResultado(secretNumber, guessedNumbers, success) {
-    if (success) {
-        console.log("Felicidades, adivinaste el número secreto: " + secretNumber);
-        console.log("Números introducidos antes de adivinar: " + guessedNumbers.join(", "));
+function comenzarJuego() {
+    if (!selectedValue) {
+        alertSweet("Por favor, selecciona una cantidad de intentos antes de comenzar.", "error");
+        return;
+    }
+
+    alertSweet("El juego ha comenzado. ¡Intenta adivinar el número secreto!", "success", "¡Comienza el juego!");
+    // Inicializar el juego
+    attempts = parseInt(selectedValue);
+    secretNumber = Math.floor(Math.random() * 100) + 1;
+    guessedNumbers = [];
+    currentAttempt = 0;
+    // Bloquear los botones de opción para que no se puedan cambiar
+    optionButtons.forEach(btn => {
+        btn.disabled = true;
+    });
+
+    numberContainer.classList.remove('hidden'); // Quitar la clase 'hidden' para mostrar el contenedor del input
+    // Cambiar el texto del botón a "Adivinar"
+    adivinarBtn.textContent = "Adivinar";
+    adivinarBtn.removeEventListener("click", comenzarJuego);
+    adivinarBtn.addEventListener("click", verificarNumero);
+
+    
+}
+function verificarNumero() {
+    if (currentAttempt >= attempts) {
+        alertSweet("Has agotado todos tus intentos. El número secreto era: " + secretNumber, "error");
+        reiniciarJuego();
+        return;
+    }
+
+    let userNum = solicitarNumero();
+    if (userNum === null) {
+        return; // Si el número no es válido, no cuenta como intento
+    }
+
+    guessedNumbers.push(userNum); // Agregar el número ingresado a la lista
+    currentAttempt++; // Incrementar el contador de intentos
+
+    if (userNum === secretNumber) {
+        alertSweet("Números introducidos: " + guessedNumbers.join(", ") + "\nIntentos: " + currentAttempt, "success", "¡Felicidades! Adivinaste el número secreto " + secretNumber);
+        reiniciarJuego();
     } else {
-        console.log("Has agotado tus intentos. El número secreto era: " + secretNumber);
-        console.log("Números introducidos en los intentos: " + guessedNumbers.join(", "));
-    }
-}
-
-function adivinaNumero() {
-    let attempts = prompt("Ingresa cantidad de intentos: ");
-    let secretNumber = Math.floor(Math.random() * 100) + 1;
-    let guessedNumbers = [];
-    let success = false;
-
-    for (let i = 0; i < attempts; i++) {
-        let userNum = solicitarNumero("Adivina el número secreto entre 1 y 100: ");
-        if (userNum === null) {
-            i--; // Decrementa el contador de intentos si la entrada no es válida
-            continue; // Pide el número nuevamente
-        }
-        if (userNum === secretNumber) {
-            success = true;
-            break;
+        if (currentAttempt < attempts) {
+            alertSweet("Ups, el número secreto es incorrecto. Te quedan " + (attempts - currentAttempt) + " intentos.", "error");
         } else {
-            console.log("Ups, el número secreto es incorrecto, vuelve a intentarlo.");
-            guessedNumbers.push(userNum);
+            alertSweet("Has agotado todos tus intentos. El número secreto era: " + secretNumber, "error");
+            console.log("Números introducidos: " + guessedNumbers.join(", ")); // Mostrar números ingresados
+            reiniciarJuego();
         }
     }
-
-    mostrarResultado(secretNumber, guessedNumbers, success);
 }
 
-adivinaNumero(); // Llama a la función para iniciar el juego
+function alertSweet(text, type, title) {
+    if(type == "error"){
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: text,
+        })
+    } else if(type == "success"){
+        Swal.fire({
+            title: title||"Resultado",
+            html: text.replace(/\n/g, '<br>'), //Reemplazar \n por <br> para saltos de línea
+        })
+    }
+}
+
+function reiniciarJuego() {
+    // Reiniciar el juego
+    adivinarBtn.textContent = "Comenzar Juego";
+    adivinarBtn.removeEventListener("click", verificarNumero);
+    adivinarBtn.addEventListener("click", comenzarJuego);
+    numberInput.value = ""; // Limpiar el input
+    selectedValue = null; // Reiniciar la selección de intentos
+    attempts = 0; // Reiniciar intentos
+    secretNumber = null; // Reiniciar número secreto
+    guessedNumbers = []; // Reiniciar números ingresados
+    currentAttempt = 0; // Reiniciar intentos actuales
+
+    numberContainer.classList.add('hidden'); // Ocultar el contenedor del input
+    // Habilitar los botones de opción nuevamente
+    optionButtons.forEach(btn => {
+        btn.disabled = false;
+    });
+}
+// Inicializar el juego al cargar la página
+document.addEventListener("DOMContentLoaded", function () {
+    adivinarBtn.addEventListener("click", comenzarJuego);
+});
